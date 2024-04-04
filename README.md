@@ -23,6 +23,10 @@ uvicorn을 이용하여 run.py 의 app을 실행해 줍니다.
 uvicorn run:app --reload --port 8000
 ```
 
+## 인프라 아키텍처
+![chat infra architecture drawio](https://github.com/ShinHeeEul/coredot-chat-demo/assets/83682424/0938e18d-1a2f-46d8-a594-e31100379cf4)
+
+
 ## 스크린샷
 
 ![스크린샷 2024-01-09 오후 3 13 37](https://github.com/CoreDotToday/coredot-chat-demo/assets/5226919/be19882a-ce3f-4d49-8b40-a21a4c1dfb1e)
