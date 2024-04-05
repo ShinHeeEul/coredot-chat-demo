@@ -78,14 +78,9 @@
             }
         });
     </script>
-    <style>
-        body {
+    <style type="text/css" media="screen">
+        * {
             font-family: Georgia;
-            background-image: url('https://example.com/your-image-path.jpg'); /* 이미지 경로를 실제 사용할 이미지의 경로로 변경하세요 */
-            background-size: cover;
-            color: #fff;
-            margin: 0;
-            padding: 0;
         }
 
         a {
@@ -97,15 +92,14 @@
             text-decoration: underline;
         }
 
-        .bordered {
+        div.bordered {
             margin: 0 auto;
             margin-top: 100px;
             width: 600px;
             padding: 20px;
             text-align: center;
             border: 10px solid #ddd;
-            border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.7);
+            -webkit-border-radius: 20px;
         }
 
         #error {
@@ -127,7 +121,7 @@
         #ask span.join {
             padding: 10px;
             background-color: #ddd;
-            border-radius: 10px;
+            -webkit-border-radius: 10px;
         }
 
         #channel {
@@ -195,7 +189,7 @@
         div#input #message {
             width: 600px;
             border: 5px solid #bbb;
-            border-radius: 3px;
+            -webkit-border-radius: 3px;
             font-size: 30pt;
         }
     </style>
