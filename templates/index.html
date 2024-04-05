@@ -1,24 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>League of Legends Chat</title>
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'></script>
+    <script>
+        $(document).ready(function () {
+            if (typeof WebSocket != 'undefined') {
+                $('#ask').show();
+            } else {
+                $('#error').show();
+            }
+
+            // join on enter
+            $('#ask input').keydown(function (event) {
+                if (event.keyCode == 13) {
+                    $('#ask a').click();
+                }
+            })
+
+            // join on click
+            $('#ask a').click(function () {
+                join($('#ask input').val());
+                $('#ask').hide();
+                $('#channel').show();
+                $('input#message').focus();
+            });
+
+            function join(name) {
+                // var host = window.location.host.split(':')[0];
+                var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+                var ws_path = ws_scheme + '://' + window.location.host;
+                var ws = new WebSocket(ws_path);
+
+                var container = $('div#msgs');
+                ws.onmessage = function (evt) {
+                    var obj = JSON.parse(evt.data);
+                    if (typeof obj != 'object') return;
+
+                    var action = obj['action'];
+                    var struct = container.find('li.' + action + ':first');
+                    if (struct.length < 1) {
+                        console.log("Could not handle: " + evt.data);
+                        return;
+                    }
+
+                    var msg = struct.clone();
+                    msg.find('.time').text((new Date()).toString("HH:mm:ss"));
+
+                    if (action == 'message') {
+                        var matches;
+                        if (matches = obj['message'].match(/^\s*[\/\\]me\s(.*)/)) {
+                            msg.find('.user').text(obj['user'] + ' ' + matches[1]);
+                            msg.find('.user').css('font-weight', 'bold');
+                        } else {
+                            msg.find('.user').text(obj['user']);
+                            msg.find('.message').text(': ' + obj['message']);
+                        }
+                    } else if (action == 'control') {
+                        msg.find('.user').text(obj['user']);
+                        msg.find('.message').text(obj['message']);
+                        msg.addClass('control');
+                    }
+
+                    if (obj['user'] == name) msg.find('.user').addClass('self');
+                    container.find('ul').append(msg.show());
+                    container.scrollTop(container.find('ul').innerHeight());
+                }
+
+                $('#channel form').submit(function (event) {
+                    event.preventDefault();
+                    var input = $(this).find(':input');
+                    var msg = input.val();
+                    if (msg) {
+                        ws.send(JSON.stringify({ action: 'message', user: name, message: msg }));
+                    }
+                    input.val('');
+                });
+            }
+        });
+    </script>
     <style>
         body {
-            font-family: "Arial", sans-serif;
-            background-image: url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg'); /* 롤 챔피언 이미지를 사용하거나 적절한 롤 테마 이미지로 변경하세요 */
+            font-family: Georgia;
+            background-image: url('https://example.com/your-image-path.jpg'); /* 이미지 경로를 실제 사용할 이미지의 경로로 변경하세요 */
             background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
             color: #fff;
             margin: 0;
             padding: 0;
         }
 
         a {
-            color: #fff;
+            color: #000;
             text-decoration: none;
         }
 
@@ -32,13 +103,13 @@
             width: 600px;
             padding: 20px;
             text-align: center;
-            border: 10px solid #3b7b9e; /* 롤 블루 */
+            border: 10px solid #ddd;
             border-radius: 20px;
-            background-color: rgba(0, 0, 0, 0.7); /* 배경색은 투명도 조절 가능 */
+            background-color: rgba(255, 255, 255, 0.7);
         }
 
         #error {
-            background-color: #ba0000;
+            background-color: #BA0000;
             color: #fff;
             font-weight: bold;
         }
@@ -51,22 +122,12 @@
             font-size: 20pt;
             padding: 10px;
             margin: 0 10px;
-            background-color: #1f2937; /* 롤 블루 */
-            color: #fff;
-            border: 2px solid #3b7b9e; /* 롤 블루 */
-            border-radius: 5px;
-            outline: none;
-        }
-
-        #ask input:focus {
-            border-color: #a0aec0; /* 롤 골드 */
         }
 
         #ask span.join {
             padding: 10px;
-            background-color: #3b7b9e; /* 롤 블루 */
+            background-color: #ddd;
             border-radius: 10px;
-            cursor: pointer;
         }
 
         #channel {
@@ -84,10 +145,6 @@
             line-height: 20px;
             padding: 5px;
             width: 630px;
-            background-color: rgba(0, 0, 0, 0.7); /* 배경색은 투명도 조절 가능 */
-            border: 2px solid #3b7b9e; /* 롤 블루 */
-            border-radius: 5px;
-            color: #fff;
         }
 
         div#msgs {
@@ -107,7 +164,7 @@
         }
 
         div#msgs li span.user {
-            color: #ff9900; /* 롤 골드 */
+            color: #ff9900;
         }
 
         div#msgs li span.user.self {
@@ -137,30 +194,25 @@
 
         div#input #message {
             width: 600px;
-            border: 5px solid #3b7b9e; /* 롤 블루 */
+            border: 5px solid #bbb;
             border-radius: 3px;
             font-size: 30pt;
-            padding: 10px;
-            background-color: #1f2937; /* 롤 블루 */
-            color: #fff;
-            outline: none;
-        }
-
-        div#input #message:focus {
-            border-color: #a0aec0; /* 롤 골드 */
         }
     </style>
 </head>
 
 <body>
     <div id="error" class="bordered" style="display: none;">
-        This browser has no native WebSocket support.<br>
+        This browser has no native WebSocket support.<br />
         Use a WebKit nightly or Google Chrome.
     </div>
-    <div style="" class="bordered" id="ask">
-        닉네임: <input type="text" id="name"> <a href="#"><span class="join">들어가기</span></a>
+    <div id="ask" class="bordered" style="display: none;">
+        닉네임: <input type="text" id="name" /> <a href="#"><span class="join">들어가기</span></a>
     </div>
     <div id="channel" class="bordered" style="display: none;">
+        <div id="descr" class="bordered">
+            <strong><a href="https://github.com/CoreDotToday/coredot-chat-demo" target="_blank">coredot-chat-demo</a> : </strong> 헤더 없이는 데모로 작동합니다. 여러 개의 브라우저에서 계정 테스트를 수행하세요.
+        </div>
         <div id="msgs">
             <ul>
                 <li class="message" style="display: none">
@@ -170,7 +222,7 @@
             </ul>
         </div>
         <div id="input">
-            <form><input type="text" id="message"></form>
+            <form><input type="text" id="message" /></form>
         </div>
     </div>
 </body>
