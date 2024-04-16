@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../fast-api"
+		},
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../aws-lambda-docker-template"
+		}
+	],
+	"settings": {}
+}
